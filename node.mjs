@@ -1,52 +1,7 @@
-class web {
-  publicKey
-  privateKey
-  async createKeys() {
-    return new Promise(async (r) => {
-      const keys = await window.crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-384" }, true, ["sign", "verify"])
-      this.publicKey = keys.publicKey
-      this.privateKey = keys.privateKey
-      r({
-        public: await this.exportPublic(),
-        private: await this.exportPrivate()
-      })
-    })
-  }
-  buf2hex(buffer) {
-    return [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('')
-  }
-  async sign(s) {
-    return this.buf2hex(await crypto.subtle.sign({ name: 'ECDSA', hash: { name: 'SHA-384' } }, this.privateKey, new TextEncoder().encode(s)))
-  }
-  async verify(s, sig) {
-    return await crypto.subtle.verify({ name: 'ECDSA', hash: { name: 'SHA-384' } }, this.publicKey, new TextEncoder().encode(sig), new TextEncoder().encode(s))
-  }
-  exportPublic() {
-    return crypto.subtle.exportKey('jwk', this.publicKey)
-  }
-  exportPrivate() {
-    return crypto.subtle.exportKey('jwk', this.privateKey)
-  }
-  importPublic(jwk) {
-    return this.public = crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-384' }, true, ['verify'])
-  }
-  importPrivate(jwk) {
-    return this.private = crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-384' }, true, ['sign'])
-  }
-  async hash(s) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
-  }
-}
-
-var k = new web(), sig = ''
-const keys = await k.createKeys()
-console.log(keys)
-console.log(sig = await k.sign('sd'))
-console.log(await k.verify('sd', sig))
-
-
-class node {
+import { createECDH, createPublicKey, createSign, createVerify, 
+  createHash, createCipheriv, createDecipheriv, randomBytes } from 'node:crypto'
+    
+class Simplesign {
   public = ''
   public_compressed = ''
   public_for_verify = ''
@@ -54,7 +9,6 @@ class node {
   #pem
 
   async createKeys (privateHex) {
-    const { createECDH, createPublicKey, createPrivateKey, createVerify, createSign, createHash, createCipheriv, createDecipheriv, randomBytes } = await import('crypto')
     const ecdh = createECDH('secp256k1')
     privateHex ? ecdh.setPrivateKey(privateHex, 'hex') : ecdh.generateKeys()
     var pemformat = `308201510201010420${ecdh.getPrivateKey('hex')}a081e33081e0020101302c06072a8648ce3d0`
@@ -119,8 +73,7 @@ class node {
        Tests  
 ******************/
 
-
-  const crypto = new CRYPTO('844a4f5aaeef10dd522761264ae08ebe7b1a50d5dfaa18f48979c78b0e9a0f33')
+  const crypto = new Simplesign('844a4f5aaeef10dd522761264ae08ebe7b1a50d5dfaa18f48979c78b0e9a0f33')
   // Create keys with provided private key
   console.log(`1 New Keys: ${JSON.stringify(crypto, null, 2)}`)
   // Sign a message
