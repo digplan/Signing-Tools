@@ -1,37 +1,50 @@
 class web {
-  public
-  #private
-  createKeys(private) {
-    const keyPair = window.crypto.subtle.generateKey(
-      {
-        name: "ECDSA",
-        namedCurve: "P-384"
-      },
-      true,
-      ["sign", "verify"]
-    )
-    this.public = keyPair.publicKey
-    this.private = keyPair.privateKey
+  publicKey
+  privateKey
+  async createKeys() {
+    return new Promise(async (r) => {
+      const keys = await window.crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-384" }, true, ["sign", "verify"])
+      this.publicKey = keys.publicKey
+      this.privateKey = keys.privateKey
+      r({
+        public: await this.exportPublic(),
+        private: await this.exportPrivate()
+      })
+    })
   }
-  sign (s) {
-    return crypto.subtle.sign('ECDSA', this.private, new TextEncoder().encode(s))
+  buf2hex(buffer) {
+    return [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('')
   }
-  verify (s, signature) {
-    return crypto.subtle.verify('ECDSA', this.public, new TextEncoder().encode(s), new TextEncoder().encode(signature))
+  async sign(s) {
+    return this.buf2hex(await crypto.subtle.sign({ name: 'ECDSA', hash: { name: 'SHA-384' } }, this.privateKey, new TextEncoder().encode(s)))
   }
-  exportPublic () {
-    return crypto.subtle.exportKey('jwk', this.public)
+  async verify(s, sig) {
+    return await crypto.subtle.verify({ name: 'ECDSA', hash: { name: 'SHA-384' } }, this.publicKey, new TextEncoder().encode(sig), new TextEncoder().encode(s))
+  }
+  exportPublic() {
+    return crypto.subtle.exportKey('jwk', this.publicKey)
   }
   exportPrivate() {
-    return crypto.subtle.exportKey('jwk', this.private)
+    return crypto.subtle.exportKey('jwk', this.privateKey)
   }
-  importPublic (jwk) {
-    return this.public = crypto.subtle.importKey('jwk', jwk, {name: 'ECDSA', namedCurve: 'P-384'}, true, ['verify'])
+  importPublic(jwk) {
+    return this.public = crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-384' }, true, ['verify'])
   }
   importPrivate(jwk) {
     return this.private = crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-384' }, true, ['sign'])
   }
+  async hash(s) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
+  }
 }
+
+var k = new web(), sig = ''
+const keys = await k.createKeys()
+console.log(keys)
+console.log(sig = await k.sign('sd'))
+console.log(await k.verify('sd', sig))
+
 
 class node {
   public = ''
