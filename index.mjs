@@ -1,21 +1,35 @@
 class web {
   public
-  private
-  createKeys() {
-
+  #private
+  createKeys(private) {
+    const keyPair = window.crypto.subtle.generateKey(
+      {
+        name: "ECDSA",
+        namedCurve: "P-384"
+      },
+      true,
+      ["sign", "verify"]
+    )
+    this.public = keyPair.publicKey
+    this.private = keyPair.privateKey
   }
-  sign () {
-
+  sign (s) {
+    return crypto.subtle.sign('ECDSA', this.private, new TextEncoder().encode(s))
   }
-  verify () {
-
+  verify (s, signature) {
+    return crypto.subtle.verify('ECDSA', this.public, new TextEncoder().encode(s), new TextEncoder().encode(signature))
   }
-  export () {
-
+  exportPublic () {
+    return crypto.subtle.exportKey('jwk', this.public)
   }
-  import () {
-
-    
+  exportPrivate() {
+    return crypto.subtle.exportKey('jwk', this.private)
+  }
+  importPublic (jwk) {
+    return this.public = crypto.subtle.importKey('jwk', jwk, {name: 'ECDSA', namedCurve: 'P-384'}, true, ['verify'])
+  }
+  importPrivate(jwk) {
+    return this.private = crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-384' }, true, ['sign'])
   }
 }
 
@@ -94,32 +108,23 @@ class node {
 
 
   const crypto = new CRYPTO('844a4f5aaeef10dd522761264ae08ebe7b1a50d5dfaa18f48979c78b0e9a0f33')
-
-  crypto.dump()
-
   // Create keys with provided private key
   console.log(`1 New Keys: ${JSON.stringify(crypto, null, 2)}`)
-
   // Sign a message
   const sig = crypto.sign('this message')
   console.log(`2 Signing message. sig = ${sig}`)
-
   // Verify a message
   const verified = crypto.verify('this message', sig)
   console.log(`3 Verify message: ${verified}`)
-
   // Verify a message with public key
   const verified2 = JSON.stringify(crypto.verifyPublic('this message', sig))
   console.log(`4 Verify message with public: ${verified2}`)
-
   // Hash a message
   const hashed = crypto.hash('cb')
   console.log(`5 Hash a value: ${hashed}`)
-
   // Encrypt a string
   let encryptedData = crypto.encrypt('text to hide')
   console.log(`6 Encrypt "text to hide": ${JSON.stringify(encryptedData)}`)
-
   // Decrypt a string
   let decryptedData = crypto.decrypt(encryptedData)
   console.log(`7 Decrypt some data: ${decryptedData}`)
