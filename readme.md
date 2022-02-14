@@ -1,4 +1,5 @@
 # simplesigner
+Simpler api for EC keys
 
 ### Node
 ````js
@@ -39,8 +40,6 @@ console.log(`Decrypt some data: ${decryptedData}`)
 ````
 
 ## Browser
-<script src='https://unpkg.com/simplesign/browser.js>
-
 ````js
   const simplesign = new Simplesign()
 
