@@ -9,7 +9,7 @@ const crypto = new Signingtools()
 crypto.createKeys('844a4f5aaeef10dd522761264ae08ebe7b1a50d5dfaa18f48979c78b0e9a0f33')
 console.log(`Created keys: ${JSON.stringify(crypto, null, 2)}`)
 
-// Sign a message'
+// Sign a message
 const message = 'this message'
 const sig = crypto.sign(message)
 console.log(`Signing message. ${message}, sig = ${sig}`)
@@ -41,6 +41,8 @@ console.log(`Decrypt some data: ${decryptedData}`)
 
 ## Browser
 ````js
+  // <script src='//unpkg.com/signing-tools/browser.js'></script>
+  
   const simplesign = new Simplesign()
 
   const keys = await simplesign.createKeys()
