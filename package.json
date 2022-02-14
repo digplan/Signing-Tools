@@ -1,0 +1,19 @@
+{
+  "name": "signing-tools",
+  "version": "0.1.0",
+  "description": "Sign messages and use keys in Node and browser",
+  "main": "node.mjs",
+  "scripts": {
+    "test": "node test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digplan/signing-tools.git"
+  },
+  "author": "cborkert@outlook.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/digplan/signing-tools/issues"
+  },
+  "homepage": "https://github.com/digplan/signing-tools#readme"
+}
