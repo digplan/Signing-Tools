@@ -42,7 +42,8 @@ console.log(`Decrypt some data: ${decryptedData}`)
 ## Browser
 ````js
   // <script src='//unpkg.com/signing-tools/browser.js'></script>
-  
+
+  // <script type='module'>
   const simplesign = new Simplesign()
 
   const keys = await simplesign.createKeys()
