@@ -1,6 +1,6 @@
-import { Signingtools } from './node.mjs'
+import { SigningTools } from './index.mjs'
 
-const crypto = new Signingtools()
+const crypto = new SigningTools()
 crypto.createKeys('844a4f5aaeef10dd522761264ae08ebe7b1a50d5dfaa18f48979c78b0e9a0f33')
 console.log(`Created keys: ${JSON.stringify(crypto, null, 2)}`)
 
@@ -12,14 +12,6 @@ console.log(`Signing message. ${message}, sig = ${sig}`)
 // Verify a message
 const verified = crypto.verify(message, sig)
 console.log(`Verifying message: ${verified} ${sig} ${message}`)
-
-// Verify a message with public key
-const verified2 = JSON.stringify(crypto.verifyPublic(message, sig))
-console.log(`Verify message with public: ${message} ${sig} ${verified2}`)
-
-// Verify a message with public key
-const verified3 = JSON.stringify(crypto.verifyPublic('bad msg', sig))
-console.log(`Failed verify message with public: ${message} ${sig} ${verified3}`)
 
 // Hash a message
 const hashed = crypto.hash('cb')
