@@ -9,6 +9,7 @@ if(typeof window !== 'undefined') {
 class Keys {
     publicKey
     privateKey
+    encryptionKey
     async createKeys() {
         return new Promise(async (r) => {
             const keys = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-384" }, true, ["sign", "verify"])
@@ -19,6 +20,10 @@ class Keys {
                 private: await this.exportPrivate()
             })
         })
+    }
+    async createEncryptionKey() {
+        this.encryptionKey = crypto.subtle.generateKey({ name: "AES-CTR", length: 256 }, true, ["encrypt", "decrypt"])
+        return this.encryptionKey
     }
     buf2hex(buffer) {
         return [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('')
@@ -49,11 +54,11 @@ class Keys {
         return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
     }
     async encrypt(s) {
-        const buf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: crypto.getRandomValues(new Uint8Array(12)) }, this.privateKey, new TextEncoder().encode(s))
+        const buf = await crypto.subtle.encrypt({ name: 'AES-CTR', iv: crypto.getRandomValues(new Uint8Array(12)) }, this.encryptionKey, new TextEncoder().encode(s))
         return this.buf2hex(buf)
     }
     async decrypt(s) {
-        const buf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: this.hex2buf(s.slice(0, 24)) }, this.privateKey, this.hex2buf(s.slice(24)))
+        const buf = await crypto.subtle.decrypt({ name: 'AES-CTR', iv: this.hex2buf(s.slice(0, 24)) }, this.encryptionKey, this.hex2buf(s.slice(24)))
         return new TextDecoder().decode(buf)
     }
 }
