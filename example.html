@@ -1,31 +1,40 @@
-<script src='./browser.js'></script>
+<script src='./index.js'></script>
 
 <script type='module'>
+  function w(s) {
+    if(typeof s === 'object') s = JSON.stringify(s)
+    document.write(`${s}<br><br>`)
+  }
+  import SigningTools from './index.mjs'
   const simplesign = new SigningTools()
 
   const keys = await simplesign.createKeys()
-  console.log(keys)
+  w('await simplesign.createKeys()');
+  w(keys)
    
   const sig = await simplesign.sign('hello world')
-  console.log('sign a string', sig)
+  w("await simplesign.sign('hello world')")
+  w(sig)
 
   const verified = await simplesign.verify('hello world', sig)
-  console.log('verified true should be true', verified, sig)
+  w("await simplesign.verify('hello world', sig)")
+  w(verified)
 
   const notverified = await simplesign.verify('!world', sig)
-  console.log('verified should be false', notverified)
+  w("await simplesign.verify('!world', sig)")
+  w(await simplesign.verify('!world', sig))
 
   const notverified2 = await simplesign.verify('hello world', 'BADSIG')
   console.log('verified should be false', notverified2)
 
-  const hash = await simplesign.hash('cb')
-  console.log('hash', hash=='103d6254a6d94bacc82e822885185f56c69cb799ec5124c0aa405e386975151b', hash)
+  w("await simplesign.hash('cb')")
+  w(await simplesign.hash('cb'))
 
-  const exportPub = await simplesign.exportPublic()
-  console.log('export public', exportPub)
+  w('await simplesign.exportPublic() // jwk')
+  w(await simplesign.exportPublic())
 
-  const exportPriv = await simplesign.exportPrivate()
-  console.log('export private', exportPriv)
+  w('await simplesign.exportPrivate() // jwk')
+  w(await simplesign.exportPrivate())
 
   const jwk = `{
   "crv": "P-384",
@@ -38,7 +47,8 @@
   }`
 
   const k = await simplesign.importPrivate(jwk)
-  console.log('import private', k)
+  w("await simplesign.importPrivate(jwk)")
+  w(k)
 
   const exp = await simplesign.exportPrivate()
   console.log(jwk)

@@ -6,7 +6,7 @@ if(typeof window !== 'undefined') {
     crypto = (await import('crypto')).webcrypto
 }
 
-class Keys {
+export default class Keys {
     publicKey
     privateKey
     encryptionKey
@@ -62,5 +62,3 @@ class Keys {
         return new TextDecoder().decode(buf)
     }
 }
-
-export { Keys }
