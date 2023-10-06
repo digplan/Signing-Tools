@@ -1,19 +1,14 @@
 {
-  "name": "signing-tools",
-  "version": "0.2.0",
-  "description": "Sign messages and use keys in Node and browser",
-  "main": "node.mjs",
+  "name": "simplesign",
+  "description": "Sign and verify messages with bitcoin compatible keys",
+  "version": "0.0.8",
+  "main": "simplesign.js",
+  "dependencies": {
+    "bitcore-lib": "*",
+    "secp256k1": "^3.5.0"
+  },
   "scripts": {
-    "test": "node test.mjs"
+    "test": "node test.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/digplan/signing-tools.git"
-  },
-  "author": "cborkert@outlook.com",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/digplan/signing-tools/issues"
-  },
-  "homepage": "https://github.com/digplan/signing-tools#readme"
+  "runkitExampleFilename": "test.js"
 }
