@@ -3,9 +3,9 @@ Simpler api for EC keys
 
 ### Node
 ````js
-import { Signingtools } from 'signing-tools'
+import SigningTools from 'signing-tools'
 
-const crypto = new Signingtools()
+const crypto = new SigningTools()
 crypto.createKeys('844a4f5aaeef10dd522761264ae08ebe7b1a50d5dfaa18f48979c78b0e9a0f33')
 console.log(`Created keys: ${JSON.stringify(crypto, null, 2)}`)
 
