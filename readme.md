@@ -1,89 +1,140 @@
-# simplesigner
-Simpler api for EC keys
+# Signing Tools
 
-### Node
-````js
+A simple API for cryptographic operations using EC keys. Supports both Node.js and browser environments.
+
+## Installation
+
+```bash
+npm install signing-tools
+```
+
+## Features
+
+- Key generation and management
+- Message signing and verification
+- Public key verification
+- Hashing
+- Encryption/Decryption
+- JWK import/export support
+
+## Usage
+
+### Node.js
+
+```js
 import SigningTools from 'signing-tools'
 
+// Initialize with optional private key
 const crypto = new SigningTools()
-crypto.createKeys('844a4f5aaeef10dd522761264ae08ebe7b1a50d5dfaa18f48979c78b0e9a0f33')
-console.log(`Created keys: ${JSON.stringify(crypto, null, 2)}`)
+await crypto.createKeys('844a4f5aaeef10dd522761264ae08ebe7b1a50d5dfaa18f48979c78b0e9a0f33')
 
-// Sign a message
+// Get key information
+console.log('Keys:', {
+  public: crypto.public,
+  public_compressed: crypto.public_compressed,
+  public_for_verify: crypto.public_for_verify
+})
+
+// Sign and verify
 const message = 'this message'
-const sig = crypto.sign(message)
-console.log(`Signing message. ${message}, sig = ${sig}`)
+const sig = await crypto.sign(message)
+console.log('Signature:', sig)
 
-// Verify a message
-const verified = crypto.verify(message, sig)
-console.log(`Verifying message: ${verified} ${sig} ${message}`)
+const verified = await crypto.verify(message, sig)
+console.log('Verified:', verified)
 
-// Verify a message with public key
-const verified2 = JSON.stringify(crypto.verifyPublic(message, sig))
-console.log(`Verify message with public: ${message} ${sig} ${verified2}`)
+// Verify with public key
+const verified2 = await crypto.verifyPublic(message, sig)
+console.log('Verified with public key:', verified2)
 
-// Verify a message with public key
-const verified3 = JSON.stringify(crypto.verifyPublic('bad msg', sig))
-console.log(`Failed verify message with public: ${message} ${sig} ${verified3}`)
+// Hash
+const hashed = await crypto.hash('cb')
+console.log('Hash:', hashed)
 
-// Hash a message
-const hashed = crypto.hash('cb')
-console.log(`Hash a value: "cb" ${hashed}`)
+// Encrypt/Decrypt
+const encrypted = await crypto.encrypt('secret message')
+console.log('Encrypted:', encrypted)
 
-// Encrypt a string
-let encryptedData = crypto.encrypt('text to hide')
-console.log(`Encrypt "text to hide": ${JSON.stringify(encryptedData)}`)
+const decrypted = await crypto.decrypt(encrypted)
+console.log('Decrypted:', decrypted)
+```
 
-// Decrypt a string
-let decryptedData = crypto.decrypt(encryptedData)
-console.log(`Decrypt some data: ${decryptedData}`)
-````
+### Browser
 
-## Browser
-````js
-  // <script src='//unpkg.com/signing-tools/browser.js'></script>
+```html
+<script src='//unpkg.com/signing-tools/browser.js'></script>
+<script type='module'>
+  const crypto = new Simplesign()
+  
+  // Generate new keys
+  const keys = await crypto.createKeys()
+  console.log('Keys:', keys)
+  
+  // Sign and verify
+  const sig = await crypto.sign('hello world')
+  console.log('Signature:', sig)
+  
+  const verified = await crypto.verify('hello world', sig)
+  console.log('Verified:', verified)
+  
+  // Hash
+  const hash = await crypto.hash('cb')
+  console.log('Hash:', hash)
+  
+  // Export keys
+  const publicKey = await crypto.exportPublic()
+  const privateKey = await crypto.exportPrivate()
+  
+  // Import JWK
+  const jwk = {
+    "crv": "P-384",
+    "d": "wouCtU7Nw4E8_7n5C1-xBjB4xqSb_liZhYMsy8MGgxUny6Q8NCoH9xSiviwLFfK_",
+    "ext": true,
+    "key_ops": ["sign"],
+    "kty": "EC",
+    "x": "SzrRXmyI8VWFJg1dPUNbFcc9jZvjZEfH7ulKI1UkXAltd7RGWrcfFxqyGPcwu6AQ",
+    "y": "hHUag3OvDzEr0uUQND4PXHQTXP5IDGdYhJhL-WLKjnGjQAw0rNGy5V29-aV-yseW"
+  }
+  
+  await crypto.importPrivate(jwk)
+</script>
+```
 
-  // <script type='module'>
-  const simplesign = new Simplesign()
+## API Reference
 
-  const keys = await simplesign.createKeys()
-  console.log(keys)
-   
-  const sig = await simplesign.sign('hello world')
-  console.log('sign a string', sig)
+### Constructor
+```js
+new SigningTools(privateKey?: string)
+```
 
-  const verified = await simplesign.verify('hello world', sig)
-  console.log('verified true should be true', verified, sig)
+### Methods
 
-  const notverified = await simplesign.verify('!world', sig)
-  console.log('verified should be false', notverified)
+#### createKeys(privateKey?: string)
+Generate new key pair or use provided private key.
 
-  const notverified2 = await simplesign.verify('hello world', 'BADSIG')
-  console.log('verified should be false', notverified2)
+#### sign(message: string)
+Sign a message.
 
-  const hash = await simplesign.hash('cb')
-  console.log('hash', hash=='103d6254a6d94bacc82e822885185f56c69cb799ec5124c0aa405e386975151b', hash)
+#### verify(message: string, signature: string)
+Verify a message signature.
 
-  const exportPub = await simplesign.exportPublic()
-  console.log('export public', exportPub)
+#### verifyPublic(message: string, signature: string, publicKey?: string)
+Verify using public key.
 
-  const exportPriv = await simplesign.exportPrivate()
-  console.log('export private', exportPriv)
+#### hash(data: string)
+Create SHA-256 hash.
 
-  const jwk = `{
-  "crv": "P-384",
-  "d": "wouCtU7Nw4E8_7n5C1-xBjB4xqSb_liZhYMsy8MGgxUny6Q8NCoH9xSiviwLFfK_",
-  "ext": true,
-  "key_ops": ["sign"],
-  "kty": "EC",
-  "x": "SzrRXmyI8VWFJg1dPUNbFcc9jZvjZEfH7ulKI1UkXAltd7RGWrcfFxqyGPcwu6AQ",
-  "y": "hHUag3OvDzEr0uUQND4PXHQTXP5IDGdYhJhL-WLKjnGjQAw0rNGy5V29-aV-yseW"
-  }`
+#### encrypt(data: string)
+Encrypt data using AES-256-CTR.
 
-  const k = await simplesign.importPrivate(jwk)
-  console.log('import private', k)
+#### decrypt(encryptedData: string)
+Decrypt data.
 
-  const exp = await simplesign.exportPrivate()
-  console.log(jwk)
-  console.log('export private', JSON.stringify(exp, null, 2))
-````
+#### exportPublic()
+Export public key.
+
+#### exportPrivate()
+Export private key.
+
+#### importPrivate(jwk: object)
+Import private key from JWK format.
