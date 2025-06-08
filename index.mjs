@@ -22,7 +22,7 @@ export default class Keys {
         })
     }
     async createEncryptionKey() {
-        this.encryptionKey = crypto.subtle.generateKey({ name: "AES-CTR", length: 256 }, true, ["encrypt", "decrypt"])
+        this.encryptionKey = await crypto.subtle.generateKey({ name: "AES-CTR", length: 256 }, true, ["encrypt", "decrypt"])
         return this.encryptionKey
     }
     buf2hex(buffer) {
