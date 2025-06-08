@@ -22,7 +22,7 @@ export default class Keys {
         })
     }
     async createEncryptionKey() {
-        this.encryptionKey = crypto.subtle.generateKey({ name: "AES-CTR", length: 256 }, true, ["encrypt", "decrypt"])
+        this.encryptionKey = await crypto.subtle.generateKey({ name: "AES-CTR", length: 256 }, true, ["encrypt", "decrypt"])
         return this.encryptionKey
     }
     buf2hex(buffer) {
@@ -54,11 +54,13 @@ export default class Keys {
         return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
     }
     async encrypt(s) {
-        const buf = await crypto.subtle.encrypt({ name: 'AES-CTR', iv: crypto.getRandomValues(new Uint8Array(12)) }, this.encryptionKey, new TextEncoder().encode(s))
-        return this.buf2hex(buf)
+        const counter = crypto.getRandomValues(new Uint8Array(16))
+        const buf = await crypto.subtle.encrypt({ name: 'AES-CTR', counter, length: 64 }, this.encryptionKey, new TextEncoder().encode(s))
+        return this.buf2hex(counter) + this.buf2hex(buf)
     }
     async decrypt(s) {
-        const buf = await crypto.subtle.decrypt({ name: 'AES-CTR', iv: this.hex2buf(s.slice(0, 24)) }, this.encryptionKey, this.hex2buf(s.slice(24)))
+        const counter = this.hex2buf(s.slice(0, 32))
+        const buf = await crypto.subtle.decrypt({ name: 'AES-CTR', counter, length: 64 }, this.encryptionKey, this.hex2buf(s.slice(32)))
         return new TextDecoder().decode(buf)
     }
 }
